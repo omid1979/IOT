@@ -1,7 +1,14 @@
 #!/bin/bash
 
-start_date="2024-07-01 07:00:00"
-end_date=$(date -d "$start_date +3 months" '+%Y-%m-%d %H:%M:%S')
+#start_date="2024-02-01 07:00:00"
+#end_date=$(date -d "$start_date +3 months" '+%Y-%m-%d %H:%M:%S')
+
+start_date="2025-01-29 17:00:00"  # Current date in your example
+end_date=$(date -d "$start_date +6 months" '+%Y-%m-%d %H:%M:%S')
+echo $end_date
+
+
+
 current_date="$start_date"
 output_file="datetime_table.txt"
 
