@@ -1,0 +1,69 @@
+version: '3'
+
+services:
+  # EMQX Service (MQTT Broker)
+  emqx1:
+    image: emqx:latest
+    container_name: emx1
+    hostname: emx1
+    environment:
+      - EMQX_NODE_NAME=emx1
+    ports:
+      - "1881:1883"
+    networks:
+      - iot-network
+
+  emqx2:
+    image: emqx:latest
+    container_name: emx2
+    hostname: emx2
+    environment:
+      - EMQX_NODE_NAME=emx2
+    ports:
+      - "1882:1883"
+    networks:
+      - iot-network
+
+  # Haproxy Service for Load Balancing and KeepAlive
+  haproxy:
+    image: haproxy
+    container_name: mqtt-haproxy
+    depends_on:
+      - emqx1
+      - emqx2
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    networks:
+      - iot-network
+
+  # MongoDB Service
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    volumes:
+      - ./db:/data/db
+    ports:
+      - "5698:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    networks:
+      - iot-network
+
+  # NodeRed Service
+  nodered:
+    image: nodered/node-red
+    container_name: nodered
+    volumes:
+      - ./nodered:/data
+    ports:
+      - "1880:1880"
+    networks:
+      - iot-network
+
+networks:
+  iot-network:
+    driver: bridge
+
