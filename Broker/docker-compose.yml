@@ -7,9 +7,14 @@ services:
     container_name: emx1
     hostname: emx1
     environment:
-      - EMQX_NODE_NAME=emx1
+      - "EMQX_NODE_NAME=emx@node1.emx"
+      - "EMQX_CLUSTER__DISCOVERY_STRATEGY=static"
+      - "EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.com,emqx@node2.emqx.com]"
     ports:
       - "1881:1883"
+      - "18083:18083" 
+    volumes:
+      - ./emx1:/opt/emqx/data 
     networks:
       - iot-network
 
@@ -18,13 +23,17 @@ services:
     container_name: emx2
     hostname: emx2
     environment:
-      - EMQX_NODE_NAME=emx2
+      - "EMQX_NODE_NAME=emx@node2.emx"
+      - "EMQX_CLUSTER__DISCOVERY_STRATEGY=static"
+      - "EMQX_CLUSTER__STATIC__SEEDS=[emx@node1.emx,emx@node2.emx]"  
     ports:
       - "1882:1883"
+      - "28083:18083"
+    volumes:
+      - ./emx2:/opt/emqx/data 
     networks:
       - iot-network
 
-  # Haproxy Service for Load Balancing and KeepAlive
   haproxy:
     image: haproxy
     container_name: mqtt-haproxy
@@ -32,7 +41,7 @@ services:
       - emqx1
       - emqx2
     ports:
-      - "8888:8888"
+      - "1883:1883"
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
     networks:
