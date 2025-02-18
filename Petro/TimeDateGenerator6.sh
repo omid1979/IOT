@@ -1,5 +1,5 @@
 #!/bin/bash
-
+count=1 
 start_date="2023-01-01 00:00:00"  # Current date in your example
 end_date=$(date -d "$start_date +6 months" '+%Y-%m-%d %H:%M:%S')
 echo "End Date: $end_date"
@@ -25,7 +25,9 @@ while [[ $(date -d "$current_date" +%s) -le $(date -d "$end_date" +%s) ]]; do
     
     # Increment current_date by 5 minutes
     current_date=$(date -d "$current_date +5 minutes" '+%Y-%m-%d %H:%M:%S %z')
-    
+    (N=N++) 
+    echo $count
+    ((count++))
 done
 
 
