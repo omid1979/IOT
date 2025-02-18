@@ -36,7 +36,7 @@ services:
 
   haproxy:
     image: haproxy
-    container_name: mqtt-haproxy
+    container_name: haproxy
     depends_on:
       - emqx1
       - emqx2
@@ -47,20 +47,39 @@ services:
     networks:
       - iot-network
 
-  # MongoDB Service
-  mongo:
-    image: mongo:latest
-    container_name: mongodb
+  # DB Service
+  influxdb:
+    container_name: influxdb
+    image: influxdb:latest
+    environment: 
+       # Use these same configurations parameters in your telegraf configuration, mytelegraf.conf.
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=Aa@12345678
+      - DOCKER_INFLUXDB_INIT_ORG=linuxsol
+      - DOCKER_INFLUXDB_INIT_BUCKET=mqtt
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=mytoken
     volumes:
-      - ./db:/data/db
+      - ./data:/var/lib/influxdb2:rw
     ports:
-      - "5698:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      - "8086:8086"
     networks:
       - iot-network
 
+  ## Telegraf
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    volumes:
+      #  Sync timezone with host
+      - /etc/localtime:/etc/localtime:ro
+      #  Map Telegraf configuration file
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    restart: unless-stopped
+    depends_on:
+      - influxdb
+
+        
   # NodeRed Service
   nodered:
     image: nodered/node-red
