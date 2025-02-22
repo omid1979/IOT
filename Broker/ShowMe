@@ -1,0 +1,9 @@
+haproxy                 1883
+
+telegraf:latest         8092     8094
+
+nodered/node-red        1880
+influxdb:latest         8086
+emqx:latest 		1881    18083
+emqx:latest 		1882    28083
+
